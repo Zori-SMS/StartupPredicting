@@ -2,3 +2,5 @@
 cb_db_csv/
 
 \.ipynb_checkpoints/
+
+glove\.6B\.50d\.txt
