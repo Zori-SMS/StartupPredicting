@@ -26,29 +26,20 @@ class Model:
 		self.Ys = tf.placeholder(tf.int32, shape=(batch_size, None))
 
 		with tf.variable_scope("model", reuse=tf.AUTO_REUSE):
-
-			# first we use GRU cell because LSTM may overfit the data
 			cell = tf.nn.rnn_cell.GRUCell()
-
-			# 'outputs' is a tensor of shape [batch_size, max_time, cell_state_size]
-
-			# defining initial state
 			initial_state = cell.zero_state(self.batch_size, dtype=tf.float32)
 
-			# 'state' is a tensor of shape [batch_size, cell_state_size]
 			self.rnn_outputs, state = tf.nn.dynamic_rnn(cell, input_data, initial_state=initial_state, dtype=tf.float32)
-
 
 			self.add_fully_connected_layers()
 			self.add_loss()
 			self.add_optimizer()
 
-
 	def add_fully_connected_layers(self):
 		reshaped_rnn_outputs = tf.reshape(self.rnn_outputs, [-1, self.hidden_size])
-		# one layer fully connected layer with relu activation, with shape [batch_size*max_length, hidden_size]
-		hidden_layer = tf.layers.dense(reshaped_rnn_outputs, self.hidden_size/2, tf.nn.relu)
-		# last layer with shape [batch_size*max_length, 2]
+		# [batch_size * max_length, hidden_size]
+		hidden_layer = tf.layers.dense(reshaped_rnn_outputs, self.hidden_size / 2, tf.nn.relu)
+		# [batch_size * max_length, 2]
 		self.reshaped_scores = tf.layers.dense(reshaped_rnn_outputs, 2)
 
 	def add_prediction(self):
@@ -57,21 +48,17 @@ class Model:
 	def add_loss(self):
 		self.loss = tf.reduce_mean( tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.Ys, logits=self.reshaped_scores))
 
-	def add_optimizer(self):
-        # Adam is used. 
+	def add_optimizer(self): 
         optimizer = tf.train.AdamOptimizer(0.001)
         self.optimize = optimizer.minimize(self.loss)
-
 
 	def save_model(self):
 		pass
 
+
 class Config:
 	def __init__(self):
 		self.batch_size = 300
-
-
-
 
 
 if __name__ == "__main__":
