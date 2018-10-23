@@ -29,6 +29,7 @@ class Model:
 			cell = tf.nn.rnn_cell.GRUCell()
 			initial_state = cell.zero_state(self.batch_size, dtype=tf.float32)
 
+			# [batch_size, max_length, hidden_size]
 			self.rnn_outputs, state = tf.nn.dynamic_rnn(cell, input_data, initial_state=initial_state, dtype=tf.float32)
 
 			self.add_fully_connected_layers()
@@ -43,10 +44,12 @@ class Model:
 		self.reshaped_scores = tf.layers.dense(reshaped_rnn_outputs, 2)
 
 	def add_prediction(self):
-		pass
+		# [batch_size, 2]
+		self.predict = tf.squeeze(tf.reahspe(self.reshaped_scores, [self.batch_size, self.max_length, 2])[:, -1, :])
+
 
 	def add_loss(self):
-		self.loss = tf.reduce_mean( tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.Ys, logits=self.reshaped_scores))
+		self.loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.Ys, logits=self.reshaped_scores))
 
 	def add_optimizer(self): 
         optimizer = tf.train.AdamOptimizer(0.001)
@@ -57,8 +60,10 @@ class Model:
 
 
 class Config:
-	def __init__(self):
-		self.batch_size = 300
+	def __init__(self, batch_size=300, input_size=20, max_length=32):
+		self.batch_size = batch_size
+		self.input_size = input_size
+		self.max_length = max_length
 
 
 if __name__ == "__main__":
