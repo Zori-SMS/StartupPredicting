@@ -32,7 +32,9 @@ if __name__ == "__main__":
 	config = Config()
 	with tf.Session as sess:
 		model = Model(config)
-		trainer = Trainer(model, config, data)
+		trainer = Trainer(model, config, data, sess)
+
+		
 
 
 
