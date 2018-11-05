@@ -4,5 +4,6 @@ cb_db_csv/
 \.ipynb_checkpoints/
 
 glove\.6B\.50d\.txt
-
+data/merge_pkl/
+data/merge_csv/
 model/__pycache__/
