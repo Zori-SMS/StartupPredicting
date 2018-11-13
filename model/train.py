@@ -1,6 +1,7 @@
 from model import Model
-from model import get_batch
 from model import Config
+from data import DataLoader
+
 import tensorflow as tf 
 
 

@@ -9,3 +9,9 @@ data/merge_csv/
 model/__pycache__/
 
 data/cleaned_product\.csv
+
+data/Y\.npy
+
+data/X_static\.npy
+
+data/X\.npy
