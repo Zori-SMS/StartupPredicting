@@ -4,6 +4,8 @@ from tqdm import tqdm
 from config import Config
 from data_combined import DataLoaderCombined 
 from model import Model
+from sklearn.metrics import precision_recall_fscore_support
+
 
 class ModelCombined(Model):
 	def __init__(self,config):
@@ -26,7 +28,7 @@ class ModelCombined(Model):
 		print(concatenated_rnn_outputs.get_shape())
 
 		# [batch_size * max_length, hidden_size]
-		hidden_layer = tf.layers.dense(concatenated_rnn_outputs, (self.hidden_size+self.static_size) / 2, tf.nn.relu)
+		hidden_layer = tf.layers.dense(concatenated_rnn_outputs, (self.hidden_size+self.static_size) // 2, tf.nn.relu)
 		# [batch_size * max_length]
 		self.reshaped_scores = tf.layers.dense(hidden_layer, 1)
 		print("size")
@@ -54,13 +56,21 @@ if __name__ == "__main__":
 			for i in process_bar:
 				Xs, ys, s = d.get_batch_train()
 				feed_dict = { model.Xs: Xs, model.Ys: ys, model.X_static: s}
-				loss, _ = sess.run([model.loss, model.optimize], feed_dict=feed_dict)
+				y_hat ,loss, _ = sess.run([model.y_hat, model.loss, model.optimize], feed_dict=feed_dict)
 
-				process_bar.set_description("Loss: %0.4f" % loss)
+				precision, recall, fbeta, _ = precision_recall_fscore_support(ys, y_hat, average='binary')
+
+				process_bar.set_description("Loss: %0.4f, precision: %0.4f, recall: %0.4f, f1: %0.4f" % (loss, precision, recall, fbeta))
 
 			print("Testing Epoch " + str(epoch))
 
 			Xs, ys, s = d.get_batch_test()
 			feed_dict = { model.Xs: Xs, model.Ys: ys, model.X_static: s}
-			loss = sess.run([model.loss], feed_dict=feed_dict)
+			y_hat, loss = sess.run([model.y_hat, model.loss], feed_dict=feed_dict)
 			print("test_loss", loss)
+			precision, recall, fbeta, _ = precision_recall_fscore_support(ys, y_hat, average='binary')
+			print("Loss: %0.4f, precision: %0.4f, recall: %0.4f, f1: %0.4f" % (loss, precision, recall, fbeta))
+
+
+
+
