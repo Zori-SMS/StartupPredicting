@@ -20,7 +20,7 @@ class ModelCombined(Model):
 	def add_fully_connected_layers(self):
 		max_length = self.max_length
 		reshaped_rnn_outputs = tf.reshape(self.rnn_outputs, [-1, self.hidden_size])
-		print(self.X_static.get_shape())
+		print(reshaped_rnn_outputs.get_shape())
 		
 		repeated_x_static = tf.tile(self.X_static, [max_length, 1])
 		print(repeated_x_static.get_shape())
